@@ -1,0 +1,45 @@
+name: task_manager
+description: A Flutter task management app with SQLite storage, repeat tasks, subtasks, notifications and export.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Local database (SQLite). sqflite = Android/iOS, sqflite_common_ffi_web = browser.
+  sqflite: ^2.3.3
+  sqflite_common_ffi_web: ^0.4.0
+  path: ^1.9.0
+  path_provider: ^2.1.3
+
+  # Settings (theme, notification sound)
+  shared_preferences: ^2.2.3
+
+  # Dates
+  intl: ">=0.19.0 <1.0.0"
+
+  # Local notifications (Android / iOS)
+  flutter_local_notifications: ^17.2.0
+  timezone: ^0.9.4
+  flutter_timezone: ^5.0.0
+
+  # Export (PDF / CSV / email)
+  pdf: ^3.10.8
+  printing: ^5.13.0
+  share_plus: ^10.0.0
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+dependency_overrides:
+  archive: ^4.5.1
