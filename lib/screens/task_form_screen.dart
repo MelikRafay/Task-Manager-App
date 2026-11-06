@@ -8,8 +8,8 @@ import '../utils/repeat.dart';
 
 class TaskFormScreen extends StatefulWidget {
   final Task? task; // null = add, otherwise edit
-  const TaskFormScreen({super.key, this.task});
-
+  final DateTime? initialDate; // pre-selected day when adding (from calendar)
+  const TaskFormScreen({super.key, this.task, this.initialDate});
   @override
   State<TaskFormScreen> createState() => _TaskFormScreenState();
 }
@@ -35,8 +35,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     _title = TextEditingController(text: t?.title ?? '');
     _desc = TextEditingController(text: t?.description ?? '');
     final soon = DateTime.now().add(const Duration(hours: 1));
+    final day = widget.initialDate;
     _due = t?.dueDate ??
-        DateTime(soon.year, soon.month, soon.day, soon.hour, 0);
+        (day != null
+            ? DateTime(day.year, day.month, day.day, 9, 0)
+            : DateTime(soon.year, soon.month, soon.day, soon.hour, 0));
     _category = t?.category ?? kCategories.first;
     _repeat = t?.repeatType ?? RepeatType.none;
     _days = {...?t?.repeatDays};

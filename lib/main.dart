@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'screens/home_screen.dart';
+import 'screens/welcome_screen.dart';
 import 'state/app_state.dart';
+import 'theme/app_theme.dart';
 
 final GlobalKey<ScaffoldMessengerState> messengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -39,17 +42,6 @@ class _TaskAppState extends State<TaskApp> {
     };
   }
 
-  ThemeData _theme(Brightness b) => ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4F46E5),
-          brightness: b,
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
-        ),
-      );
-
   @override
   Widget build(BuildContext context) {
     return AppScope(
@@ -60,12 +52,58 @@ class _TaskAppState extends State<TaskApp> {
           title: 'Task Manager',
           debugShowCheckedModeBanner: false,
           scaffoldMessengerKey: messengerKey,
-          theme: _theme(Brightness.light),
-          darkTheme: _theme(Brightness.dark),
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
           themeMode: state.themeMode,
-          home: const HomeScreen(),
+          home: const _Gate(),
         );
       }),
     );
+  }
+}
+
+/// Shows the welcome screen on first launch, then the home screen.
+class _Gate extends StatefulWidget {
+  const _Gate();
+
+  @override
+  State<_Gate> createState() => _GateState();
+}
+
+class _GateState extends State<_Gate> {
+  bool? _seen;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    var seen = true; // if storage fails, don't block the user
+    try {
+      final p = await SharedPreferences.getInstance();
+      seen = p.getBool('seen_welcome') ?? false;
+    } catch (_) {}
+    if (mounted) setState(() => _seen = seen);
+  }
+
+  Future<void> _continue() async {
+    final state = AppScope.of(context);
+    try {
+      final p = await SharedPreferences.getInstance();
+      final hadTheme = p.containsKey('theme');
+      await p.setBool('seen_welcome', true);
+      // New look defaults to dark unless the user already chose a theme.
+      if (!hadTheme) await state.setThemeMode(ThemeMode.dark);
+    } catch (_) {}
+    if (mounted) setState(() => _seen = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_seen == null) return const Scaffold();
+    if (_seen == false) return WelcomeScreen(onContinue: _continue);
+    return const HomeScreen();
   }
 }
